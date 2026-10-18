@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Clipboard Shield Gateway</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+    
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: radial-gradient(circle at top, #FFF5EC 0%, #FEE8DC 50%, #FCD5CE 100%);
+      color: #3D2219;
+    }
+
+    /* Soft Claymorphism & Neumorphic Glass Cards */
+    .phone-frame {
+      background: #FFFDF8;
+      border: 6px solid #FFF3CD;
+      box-shadow: 0 25px 60px -15px rgba(181, 105, 50, 0.2), inset 0 0 15px rgba(255, 255, 255, 0.8);
+      border-radius: 44px;
+    }
+
+    .top-pill {
+      background: #FFFDF8;
+      border: 1px solid #FFE8B8;
+      box-shadow: 0 8px 20px rgba(212, 140, 60, 0.12);
+    }
+
+    .card-surface {
+      background: #FFFDF7;
+      border: 1.5px solid #FFE9BF;
+      box-shadow: 0 4px 12px rgba(180, 110, 50, 0.05);
+    }
+
+    .btn-gradient-orange {
+      background: linear-gradient(135deg, #F97316 0%, #EA580C 100%);
+      box-shadow: 0 4px 14px rgba(234, 88, 12, 0.35);
+    }
+
+    .btn-gradient-orange:hover {
+      box-shadow: 0 6px 20px rgba(234, 88, 12, 0.5);
+    }
+
+    /* Custom Toggle Switch */
+    .toggle-bg {
+      background-color: #E2E8F0;
+      transition: background-color 0.3s ease;
+    }
+    .toggle-bg.active {
+      background-color: #FCD34D;
+    }
+    .toggle-dot {
+      transition: transform 0.3s ease;
+    }
+    .toggle-dot.active {
+      transform: translateX(20px);
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
+
+  <!-- Top Controller Bar -->
+  <div class="top-pill rounded-2xl px-5 py-2.5 flex items-center gap-4 mb-6 z-10">
+    <div class="flex items-center gap-2">
+      <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+      <span class="text-[11px] font-bold tracking-wide text-amber-950 uppercase">Target Device (Android OS)</span>
+    </div>
+    <div class="flex bg-amber-100/60 p-1 rounded-xl gap-1 text-xs font-semibold">
+      <button class="px-3 py-1 bg-white rounded-lg shadow-sm text-amber-900">Phone</button>
+      <button class="px-3 py-1 text-amber-800/70 hover:text-amber-900">C2 Terminal</button>
+    </div>
+  </div>
+
+  <!-- Mobile Screen Shell -->
+  <div class="phone-frame w-full max-w-[390px] h-[780px] p-5 flex flex-col justify-between relative overflow-hidden">
+    
+    <!-- Top Hardware Notch & Status Bar -->
+    <div>
+      <div class="w-32 h-5 bg-amber-950/90 rounded-b-2xl mx-auto -mt-5 mb-3"></div>
+      <div class="flex justify-between items-center text-xs font-bold text-amber-900/80 px-2 mb-4">
+        <span>09:41</span>
+        <div class="flex items-center gap-1.5">
+          <svg class="w-3.5 h-3.5 fill-current" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.35c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.74-1.74C9.03 20.26 10.98 21 13 21c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 16c-3.87 0-7-3.13-7-7s3.13-7 7-7 7 3.13 7 7-3.13 7-7 7z"/></svg>
+          <span class="text-[10px] bg-amber-200/60 px-1 rounded">98%</span>
+        </div>
+      </div>
+
+      <!-- Address Bar -->
+      <div class="bg-amber-50/80 border border-amber-200/80 rounded-full px-3 py-1.5 flex items-center justify-between text-xs text-amber-900 mb-4 shadow-inner">
+        <span class="text-amber-700/60 font-bold">✕</span>
+        <div class="flex items-center gap-1.5 font-medium text-[11px] text-amber-900">
+          <svg class="w-3 h-3 text-emerald-600 fill-current" viewBox="0 0 20 20"><path d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z"/></svg>
+          https://clipboard-shield.io
+        </div>
+        <span></span>
+      </div>
+    </div>
+
+    <!-- VIEW 1: AUTHENTICATION SCREEN -->
+    <div id="authView" class="flex-1 flex flex-col justify-center items-center px-2">
+      <div class="w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center shadow-lg shadow-amber-500/30 mb-4 border-2 border-amber-200">
+        <svg class="w-9 h-9 text-white fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944z" clip-rule="evenodd"/></svg>
+      </div>
+
+      <h2 class="text-base font-bold text-amber-950">Clipboard Shield Gateway</h2>
+      <p class="text-[11px] text-amber-800/70 font-medium mb-6">Authentication Required</p>
+
+      <div class="w-full space-y-3">
+        <input type="email" id="emailInput" value="user@shield.io" placeholder="Email Address" class="w-full bg-white border border-amber-200 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-amber-500 shadow-sm">
+        <input type="password" id="passInput" value="••••••••" placeholder="Password" class="w-full bg-white border border-amber-200 rounded-xl px-3.5 py-2.5 text-xs focus:outline-none focus:border-amber-500 shadow-sm">
+        
+        <div class="flex gap-2 pt-2">
+          <button onclick="login()" class="flex-1 py-2.5 rounded-xl btn-gradient-orange text-white text-xs font-bold">Sign In</button>
+          <button onclick="login()" class="flex-1 py-2.5 rounded-xl bg-white border border-amber-200 text-amber-900 text-xs font-bold hover:bg-amber-50">Sign Up</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- VIEW 2: DASHBOARD VIEW -->
+    <div id="dashView" class="hidden flex-1 flex-col space-y-4">
+      
+      <!-- Active Session User Card -->
+      <div class="card-surface p-3 rounded-2xl flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="w-9 h-9 rounded-xl bg-amber-100 border border-amber-300 flex items-center justify-center text-amber-800">
+            <svg class="w-5 h-5 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+          </div>
+          <div>
+            <div id="displayUser" class="text-xs font-bold text-amber-950">user@shield.io</div>
+            <div class="text-[10px] text-emerald-600 font-semibold flex items-center gap-1">
+              <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> Active Session
+            </div>
+          </div>
+        </div>
+        <button onclick="logout()" class="text-amber-700/60 hover:text-amber-900 p-1">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 001 1h12a1 1 0 001-1V4a1 1 0 00-1-1H3zm11 4a1 1 0 10-2 0v4a1 1 0 102 0V7z" clip-rule="evenodd"/></svg>
+        </button>
+      </div>
+
+      <!-- Perimeter Toggle Card -->
+      <div class="card-surface p-4 rounded-2xl space-y-3">
+        <div class="flex justify-between items-center">
+          <div>
+            <div class="text-xs font-bold text-amber-950">Clipboard Isolation</div>
+            <div class="text-[10px] text-amber-800/70 font-medium">Bypass System RAM Scrapers</div>
+          </div>
+          <!-- Toggle Switch -->
+          <div onclick="toggleShield()" class="w-11 h-6 toggle-bg rounded-full p-0.5 cursor-pointer flex items-center">
+            <div id="toggleDot" class="w-5 h-5 bg-white rounded-full shadow-md toggle-dot"></div>
+          </div>
+        </div>
+
+        <!-- Dynamic Status Banner -->
+        <div id="statusBanner" class="p-2.5 rounded-xl bg-rose-100/80 border border-rose-300 text-rose-800 text-[11px] font-medium flex items-center gap-2">
+          <svg class="w-4 h-4 fill-current text-rose-600 flex-shrink-0" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"/></svg>
+          <span id="statusMessage">Protection Disabled (Vulnerable)</span>
+        </div>
+      </div>
+
+      <!-- Action Button to Launch Sandbox Transfer Flow -->
+      <button onclick="launchTransferScreen()" class="w-full py-3 rounded-xl btn-gradient-orange text-white text-xs font-bold shadow-md">
+        Open Secure Sandbox Transfer
+      </button>
+
+    </div>
+
+    <!-- VIEW 3: SANDBOX TRANSFER SCREEN -->
+    <div id="transferView" class="hidden flex-1 flex-col space-y-3">
+      
+      <!-- Top Title Bar -->
+      <div class="flex items-center justify-between">
+        <button onclick="showDash()" class="text-amber-900 font-bold text-xs">‹ Back</button>
+        <span class="text-xs font-bold text-amber-950">Secure Transfer</span>
+        <span></span>
+      </div>
+
+      <!-- Shield Mode Tag -->
+      <div id="shieldBadge" class="flex justify-between items-center bg-amber-100/60 p-2 rounded-xl text-[10px] font-bold text-amber-900 border border-amber-200">
+        <span class="flex items-center gap-1">
+          <span id="badgeDot" class="w-2 h-2 rounded-full bg-amber-500"></span> 
+          <span id="badgeText">PROTECTED BY CLIPBOARD SHIELD</span>
+        </span>
+        <span class="bg-amber-200/80 px-2 py-0.5 rounded text-[9px]">RAM ISOLATED</span>
+      </div>
+
+      <!-- Account Balance Card -->
+      <div class="card-surface p-4 rounded-2xl">
+        <div class="text-[10px] font-bold text-amber-800/60 tracking-wider uppercase">Account Balance</div>
+        <div class="text-2xl font-black text-amber-950 mt-1">$10,000.00</div>
+      </div>
+
+      <!-- Transaction Details Card -->
+      <div class="card-surface p-3.5 rounded-2xl text-xs space-y-1">
+        <div class="text-amber-900"><span class="text-amber-800/70 font-medium">Recipient:</span> <b>Merchant Corp</b></div>
+        <div class="text-amber-900"><span class="text-amber-800/70 font-medium">Amount:</span> <b class="text-emerald-700">$2,500.00</b></div>
+      </div>
+
+      <!-- Isolated Auth Sandbox Card -->
+      <div class="card-surface p-4 rounded-2xl border-2 border-amber-300 space-y-3 bg-amber-50/30">
+        <div class="flex justify-between items-center">
+          <div class="flex items-center gap-1.5 text-xs font-bold text-amber-950">
+            <svg class="w-4 h-4 text-amber-700 fill-current" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 1.944A11.954 11.954 0 012.166 5C2.056 5.649 2 6.319 2 7c0 5.225 3.34 9.67 8 11.317C14.66 16.67 18 12.225 18 7c0-.682-.057-1.35-.166-2.001A11.954 11.954 0 0110 1.944z" clip-rule="evenodd"/></svg>
+            Isolated Auth Sandbox
+          </div>
+          <span class="bg-emerald-100 text-emerald-800 text-[9px] font-extrabold px-2 py-0.5 rounded-md border border-emerald-300">ZERO-TRUST</span>
+        </div>
+
+        <p class="text-[11px] text-amber-900/80 leading-snug font-medium">
+          Authorize <b>$2,500.00</b> via WebOTP direct verification. Bypasses OS clipboard.
+        </p>
+
+        <!-- OTP Direct Verification Input -->
+        <div id="otpInputContainer" class="hidden space-y-2">
+          <input type="text" id="otpValue" maxlength="6" placeholder="Enter 6-digit OTP token" class="w-full bg-white border border-amber-300 rounded-xl p-2.5 text-center font-mono font-bold text-sm tracking-widest focus:outline-none focus:border-amber-500">
+        </div>
+
+        <button id="authBtn" onclick="triggerOtpAuth()" class="w-full py-3 rounded-xl btn-gradient-orange text-white text-xs font-bold shadow-md">
+          Authorize Direct Sandbox Transfer
+        </button>
+      </div>
+
+    </div>
+
+    <!-- Bottom Architecture Tag -->
+    <div class="bg-amber-100/50 border border-amber-200/60 rounded-xl py-2 px-3 text-center">
+      <span class="text-[9px] font-extrabold text-amber-900/60 tracking-wider uppercase">Architecture: WEB_OTP_DIRECT_BIND</span>
+    </div>
+
+  </div>
+
+  <script>
+    const API_URL = "https://clipboard-shield-api.onrender.com"; // Set to your live Render backend URL
+    let shieldActive = false;
+    let currentUserEmail = "user@shield.io";
+
+    function login() {
+      const email = document.getElementById('emailInput').value || "user@shield.io";
+      currentUserEmail = email;
+      document.getElementById('displayUser').innerText = email;
+      document.getElementById('authView').classList.add('hidden');
+      document.getElementById('dashView').classList.remove('hidden');
+      document.getElementById('dashView').classList.add('flex');
+    }
+
+    function logout() {
+      document.getElementById('dashView').classList.add('hidden');
+      document.getElementById('dashView').classList.remove('flex');
+      document.getElementById('authView').classList.remove('hidden');
+    }
+
+    function toggleShield() {
+      shieldActive = !shieldActive;
+      const toggleDot = document.getElementById('toggleDot');
+      const toggleBg = toggleDot.parentElement;
+      const banner = document.getElementById('statusBanner');
+      const bannerMsg = document.getElementById('statusMessage');
+
+      if (shieldActive) {
+        toggleDot.classList.add('active');
+        toggleBg.classList.add('active');
+        banner.className = "p-2.5 rounded-xl bg-emerald-100/80 border border-emerald-300 text-emerald-800 text-[11px] font-medium flex items-center gap-2";
+        bannerMsg.innerText = "Shield Active (In-Memory Isolation)";
+      } else {
+        toggleDot.classList.remove('active');
+        toggleBg.classList.remove('active');
+        banner.className = "p-2.5 rounded-xl bg-rose-100/80 border border-rose-300 text-rose-800 text-[11px] font-medium flex items-center gap-2";
+        bannerMsg.innerText = "Protection Disabled (Vulnerable)";
+      }
+    }
+
+    function showDash() {
+      document.getElementById('transferView').classList.add('hidden');
+      document.getElementById('transferView').classList.remove('flex');
+      document.getElementById('dashView').classList.remove('hidden');
+      document.getElementById('dashView').classList.add('flex');
+    }
+
+    function launchTransferScreen() {
+      document.getElementById('dashView').classList.add('hidden');
+      document.getElementById('dashView').classList.remove('flex');
+      document.getElementById('transferView').classList.remove('hidden');
+      document.getElementById('transferView').classList.add('flex');
+
+      const badgeDot = document.getElementById('badgeDot');
+      const badgeText = document.getElementById('badgeText');
+      if (shieldActive) {
+        badgeDot.className = "w-2 h-2 rounded-full bg-emerald-500 animate-ping";
+        badgeText.innerText = "PROTECTED BY CLIPBOARD SHIELD";
+      } else {
+        badgeDot.className = "w-2 h-2 rounded-full bg-rose-500";
+        badgeText.innerText = "PERIMETER SHIELD UNPROTECTED";
+      }
+    }
+
+    async function triggerOtpAuth() {
+      const otpContainer = document.getElementById('otpInputContainer');
+      const authBtn = document.getElementById('authBtn');
+
+      if (otpContainer.classList.contains('hidden')) {
+        // Step A: Request OTP Dispatch via Backend API
+        authBtn.innerText = "Sending Real OTP...";
+        try {
+          const res = await fetch(`${API_URL}/api/send-otp`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ email: currentUserEmail })
+          });
+          const data = await res.json();
+          alert(data.message || "OTP code dispatched to email!");
+        } catch (e) {
+          alert("Demo Mode: Generated simulated OTP (849201)");
+        }
+        otpContainer.classList.remove('hidden');
+        authBtn.innerText = "Confirm & Zeroize Token";
+      } else {
+        // Step B: Submit Secret Code & Execute In-Memory Zeroization
+        const enteredOtp = document.getElementById('otpValue').value;
+        if (!enteredOtp) return alert("Enter the OTP token");
+
+        // Zeroize input memory immediately
+        document.getElementById('otpValue').value = "";
+        
+        alert("Transaction Authorized! Token memory successfully zeroized.");
+        showDash();
+      }
+    }
+  </script>
+</body>
+</html>
